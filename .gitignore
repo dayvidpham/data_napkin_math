@@ -1,2 +1,6 @@
+# NixOS, direnv
+.direnv/
+
 node_modules/
 .DS_Store
+
