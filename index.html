@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <!-- Google Fonts for a polished, newspaper-like feel -->
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap"
+    rel="stylesheet" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Napkin Math</title>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" />
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3"></script>
-  <!-- js-yaml for YAML parsing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.0.0/js-yaml.min.js"></script>
-  <!-- Scenarios module (assumed to exist) -->
-  <script type="module" src="./scenarios.js"></script>
   <style>
     /* Overall Fonts & Colors */
     body {
@@ -23,14 +22,20 @@
       margin: 0;
       padding: 0;
     }
-    h1, h2, h3, h4 {
+
+    h1,
+    h2,
+    h3,
+    h4 {
       font-family: 'Playfair Display', serif;
     }
+
     /* Fixed-top Navbar */
     .navbar.fixed-top {
       z-index: 1100;
       border-bottom: 1px solid #ddd;
     }
+
     /* Top Toolbar */
     .toolbar {
       display: flex;
@@ -40,17 +45,20 @@
       background: #fafafa;
       border-bottom: 1px solid #ddd;
     }
+
     .toolbar button {
       font-weight: 700;
     }
+
     /* Main Container using Flex */
     .main-container {
       display: flex;
-      min-height: calc(100vh - 70px); /* subtract navbar height */
+      min-height: calc(100vh - 70px);
       max-width: 1400px;
       margin: 0 auto;
       width: 100%;
     }
+
     /* Left Panel: Constrained height & scrollable */
     .left-panel {
       flex: 0 0 400px;
@@ -65,14 +73,15 @@
       gap: 15px;
       text-align: left;
     }
-    /* Main Content: Scenario Cards (with right margin when inspector is open) */
-    /* Note: on mobile we override the margin (see media query) */
+
+    /* Main Content: Scenario Cards */
     .main-content {
       flex-grow: 1;
       padding: 20px 30px;
       background: #fdfdfd;
     }
-    /* Right Panel: Fixed to side, scrollable if needed (desktop only) */
+
+    /* Right Panel: Fixed to side, scrollable (desktop only) */
     .right-panel {
       position: fixed;
       top: 70px;
@@ -89,10 +98,11 @@
       gap: 15px;
       text-align: left;
     }
-    /* Hide panels when not toggled */
+
     .hidden {
       display: none;
     }
+
     /* Card styling for scenario cards */
     .card {
       border: 1px solid #ddd;
@@ -100,33 +110,35 @@
       padding: 20px;
       margin-bottom: 30px;
       background: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
-    /* Header styling for a magazine feel */
+
     header h1 {
       font-size: 2.8rem;
       margin-bottom: 10px;
     }
+
     header p {
       font-size: 1.2rem;
       line-height: 1.6;
     }
-    /* Remove default number input spinners */
+
     input[type=number]::-webkit-outer-spin-button,
     input[type=number]::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
+
     input[type=number] {
       -moz-appearance: textfield;
     }
-    /* Left panel input rows */
+
     .input-row {
       border-bottom: 1px solid #eee;
       padding-bottom: 8px;
       margin-bottom: 8px;
     }
-    /* Result output styling for cards */
+
     .result-output {
       font-size: 1.8rem;
       font-weight: bold;
@@ -134,7 +146,7 @@
       margin: 15px 0;
       text-align: center;
     }
-    /* Calculation details area styling */
+
     .calc-details {
       background: #f7f7f7;
       padding: 10px;
@@ -142,23 +154,26 @@
       margin-top: 10px;
       font-size: 0.9rem;
     }
-    /* Change Log styling in inspector */
+
     .change-log {
       margin-top: 15px;
       font-size: 0.9rem;
     }
+
     .change-log h6 {
       margin-bottom: 5px;
     }
+
     .change-log ul {
       list-style: none;
       padding-left: 0;
     }
+
     .change-log li {
       border-bottom: 1px dashed #ccc;
       padding: 3px 0;
     }
-    /* Inline fill select styling */
+
     .inline-select {
       display: inline-block;
       width: auto;
@@ -174,12 +189,13 @@
       -webkit-appearance: none;
       -moz-appearance: none;
     }
-    /* Category Selector (tiles) */
+
     .category-selector {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
+
     .category-tile {
       padding: 8px 16px;
       border: 2px solid #10a37f;
@@ -188,9 +204,11 @@
       cursor: pointer;
       transition: background 0.2s, color 0.2s, transform 0.2s;
     }
+
     .category-tile:hover {
       transform: scale(1.03);
     }
+
     .category-tile.selected {
       background: #10a37f;
       color: #fff;
@@ -198,35 +216,95 @@
       font-weight: bold;
       box-shadow: 0 2px 8px rgba(16, 163, 127, 0.5);
     }
-    /* Responsive adjustments */
+
+    /* Error Alert styling */
+    .alert {
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .is-invalid {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
+    #errorContainer {
+      margin-bottom: 20px;
+    }
+
     @media (max-width: 768px) {
       .main-container {
         flex-direction: column;
       }
-      .left-panel, .right-panel {
+
+      .left-panel,
+      .right-panel {
         position: relative;
         flex: 0 0 auto;
         width: 100%;
         border: none;
         height: auto;
       }
+
       .right-panel {
         margin-top: 20px;
       }
-      /* Hide the inline right panel on mobile since we use a modal instead */
+
       .right-panel {
         display: none !important;
+      }
+
+      .calc-details {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+        font-size: 0.95rem;
+        border: 1px solid #e9ecef;
+      }
+
+      .calculation-steps {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        border-left: 3px solid #10a37f;
+      }
+
+      .calculation-steps pre {
+        font-family: 'Merriweather', serif;
+        font-size: 1rem;
+        white-space: pre-wrap;
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .calc-details table {
+        background-color: #fff;
+        font-size: 0.9rem;
+      }
+
+      .calc-details table th {
+        background-color: #f0f0f0;
+      }
+
+      /* For mathematical symbols */
+      .math-symbol {
+        font-family: 'Times New Roman', serif;
+        font-weight: normal;
+        margin: 0 2px;
       }
     }
   </style>
 </head>
+
 <body>
   <!-- Fixed-top Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand" href="#headerContent">Data Napkin Math</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
@@ -247,7 +325,7 @@
 
   <!-- Vue App Container (padded below the navbar) -->
   <div id="app" style="padding-top: 70px;">
-    <!-- Top Toolbar with symmetric toggle buttons -->
+    <!-- Top Toolbar -->
     <div class="toolbar">
       <button class="btn btn-primary" @click="toggleLeftPanel">
         {{ leftPanelOpen ? "Hide Inputs" : "Show Inputs" }}
@@ -260,10 +338,9 @@
     <!-- Category Selector for Scenarios -->
     <div class="container my-3">
       <div class="category-selector">
-        <div v-for="cat in uniqueCategories" :key="cat"
-             class="category-tile"
-             :class="{ selected: selectedScenario === cat }"
-             @click="toggleCategory(cat)">
+        <div v-for="cat in uniqueCategories" :key="cat" class="category-tile"
+          :class="{ selected: selectedScenario === cat }" @click="toggleCategory(cat)" role="button"
+          :aria-pressed="selectedScenario === cat ? 'true' : 'false'">
           {{ cat }}
         </div>
       </div>
@@ -271,7 +348,7 @@
 
     <!-- Main Flex Container: Left Panel & Main Content -->
     <div class="main-container">
-      <!-- Left Panel: All Inputs (Spreadsheet-like view) -->
+      <!-- Left Panel: All Inputs -->
       <div :class="['left-panel', { hidden: !leftPanelOpen }]">
         <h5 style="margin-bottom: 20px;">All Inputs</h5>
         <div v-for="(input, key) in inputs" :key="key" class="input-row">
@@ -280,9 +357,11 @@
             <small class="text-muted"> ({{ input.display_units }})</small>
           </div>
           <div class="input-group input-group-sm">
-            <input type="number" class="form-control"
-                   :value="formatValue(input.value, input.scale)"
-                   @input="updateValue($event, key)" />
+            <input type="number" class="form-control" :value="formatValue(input.value, input.scale)"
+              @input="updateValue($event, key)" />
+            <div class="invalid-feedback">
+              Please enter a valid number.
+            </div>
             <button class="btn btn-outline-secondary" type="button" @click="adjustValue(key, 10)">×10</button>
             <button class="btn btn-outline-secondary" type="button" @click="adjustValue(key, 0.1)">×0.1</button>
             <button class="btn btn-outline-secondary" type="button" @click="resetValue(key)">Reset</button>
@@ -291,15 +370,13 @@
             <button class="btn btn-outline-secondary btn-sm" @click="showDetails(key)">Inspect</button>
           </div>
         </div>
-        <!-- <button @click="loadData" class="btn btn-outline-primary btn-sm mt-3"
-                style="border-color: #10a37f; color: #10a37f;">
-          Load Data from Gist
-        </button> -->
       </div>
 
       <!-- Main Content: Scenario Cards -->
-      <!-- Note: we only reserve space for the right panel on desktop -->
       <div class="main-content" :style="{ marginRight: (!isMobile && rightPanelOpen) ? '400px' : '0' }">
+        <!-- Error message container -->
+        <div id="errorContainer"></div>
+
         <header id="headerContent">
           <h1>Napkin Math for Training Data Value</h1>
           <p>
@@ -314,29 +391,25 @@
           <p style="font-size: 1.1rem; margin-bottom: 30px;">
             Explore the various scenarios below. Modify input values and choose fill options to see how outcomes change.
           </p>
-          <!-- Calculation Cards (filtered by selectedScenario) -->
           <div v-for="(calc, index) in filteredScenarios" :key="index" class="card">
             <header>
               <h4>{{ calc.title }}</h4>
-              <!-- Process description template with inline select for each placeholder -->
               <p>
                 <template v-for="(segment, idx) in parseDescription(calc.description)" :key="idx">
                   <template v-if="segment.type === 'text'">
                     {{ segment.text }}
                   </template>
                   <template v-else>
-                    <select class="form-select form-select-sm inline-select"
-                            v-model="fillSelections[segment.variable]"
-                            @change="onCardDropdownChange(segment.variable, $event.target.value)">
+                    <select class="form-select form-select-sm inline-select" v-model="fillSelections[segment.variable]"
+                      @change="onCardDropdownChange(segment.variable, $event.target.value)">
                       <option v-for="option in getFillOptionsForType(segment.variable)" :key="option.variable"
-                              :value="option.variable">
+                        :value="option.variable">
                         {{ option.text }}
                       </option>
                     </select>
                   </template>
                 </template>
               </p>
-              <!-- Top Result Output Only -->
               <div class="result-output">
                 {{ calc.result.value }} {{ calc.result.units }}
               </div>
@@ -348,7 +421,6 @@
               </div>
             </header>
             <div v-if="Object.keys(inputs).length === 0">Loading inputs...</div>
-            <!-- For each input used by the scenario -->
             <div v-else v-for="inputKey in calc.inputs" :key="inputKey" class="mb-3">
               <label class="form-label">
                 {{ inputs[inputKey]?.nice_name || formatLabel(inputKey) }}
@@ -356,10 +428,14 @@
               </label>
               <div class="input-group">
                 <input type="number" class="form-control"
-                       :value="formatValue(inputs[inputKey].value, inputs[inputKey].scale)"
-                       @input="updateValue($event, inputKey)" />
+                  :value="formatValue(inputs[inputKey].value, inputs[inputKey].scale)"
+                  @input="updateValue($event, inputKey)" />
+                <div class="invalid-feedback">
+                  Please enter a valid number.
+                </div>
                 <button class="btn btn-outline-secondary" type="button" @click="adjustValue(inputKey, 10)">×10</button>
-                <button class="btn btn-outline-secondary" type="button" @click="adjustValue(inputKey, 0.1)">×0.1</button>
+                <button class="btn btn-outline-secondary" type="button"
+                  @click="adjustValue(inputKey, 0.1)">×0.1</button>
                 <button class="btn btn-outline-secondary" type="button" @click="resetValue(inputKey)">Reset</button>
               </div>
               <button class="btn btn-secondary btn-sm mt-2" @click="showDetails(inputKey)">Inspect This Input</button>
@@ -368,11 +444,37 @@
               {{ calc.showCalcDetails ? "Hide" : "Show" }} Calculation Details
             </button>
             <div v-if="calc.showCalcDetails" class="calc-details">
-              <strong>Calculation Function:</strong>
-              <pre>{{ calc.calculate.toString() }}</pre>
-              <strong>Raw Value:</strong> {{ calc.result.rawValue }}<br />
-              <div v-if="calc.unitDetails">
+              <strong>Calculation Steps:</strong>
+              <div class="calculation-steps">
+                <pre v-html="getCalcDetails(calc)"></pre>
+              </div>
+
+              <div class="mt-3">
+                <strong>Raw Value:</strong> {{ calc.result.rawValue }}
+              </div>
+
+              <div v-if="calc.unitDetails" class="mt-2">
                 <strong>Unit Details:</strong> {{ calc.unitDetails }}
+              </div>
+
+              <div class="mt-3">
+                <strong>Variables:</strong>
+                <table class="table table-sm table-bordered mt-2">
+                  <thead>
+                    <tr>
+                      <th>Variable</th>
+                      <th>Value</th>
+                      <th>Units</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="inputKey in calc.inputs" :key="inputKey">
+                      <td>{{ formatVariableName(inputKey) }}</td>
+                      <td>{{ humanReadable(inputs[inputKey].value) }}</td>
+                      <td>{{ inputs[inputKey].display_units }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -383,25 +485,28 @@
             <summary style="font-size: 1.2rem; cursor: pointer;">About this page</summary>
             <div style="margin-top: 10px; line-height: 1.6;">
               <p>
-                <strong>This website is in an early beta state!</strong> Head over to our GitHub page for details and to contribute.
-                There are many open debates about policy and norms around the use of data for AI systems – and often, back-of-the-envelope estimates
+                <strong>This website is in an early beta state!</strong> Head over to our GitHub page for details and to
+                contribute.
+                There are many open debates about policy and norms around the use of data for AI systems – and often,
+                back-of-the-envelope estimates
                 like these are the starting point.
               </p>
               <p>
-                This interactive tool allows you to adjust assumptions and play with the numbers. The underlying math is simple arithmetic,
+                This interactive tool allows you to adjust assumptions and play with the numbers. The underlying math is
+                simple arithmetic,
                 yet it provides a framework to reason about order-of-magnitude estimates.
               </p>
               <p>
                 To participate in the discussion regarding reasonable default values, check out the
-                <a href="https://github.com/nickmvincent/data_napkin_math" target="_blank">GitHub page</a> or leave a comment in our public folder.
+                <a href="https://github.com/nickmvincent/data_napkin_math" target="_blank">GitHub page</a> or leave a
+                comment in our public folder.
               </p>
             </div>
           </details>
         </section>
       </div>
 
-      <!-- Right Panel: Inspector (Fixed) for Desktop -->
-      <!-- (On mobile this panel is hidden via CSS; see media query) -->
+      <!-- Right Panel: Inspector for Desktop -->
       <div ref="inspectorPanel" :class="['right-panel', { hidden: !rightPanelOpen }]" id="desktopInspector">
         <button class="btn btn-outline-secondary btn-sm" @click="toggleRightPanel">Hide Inspector</button>
         <h5>Inspector</h5>
@@ -410,11 +515,16 @@
           <p><em>({{ selectedInputDetails.display_units }})</em></p>
           <ul class="list-unstyled" style="font-size: 0.95rem;">
             <li><strong>Raw Value:</strong> {{ selectedInputDetails.value }}</li>
-            <li v-if="selectedInputDetails.default_value"><strong>Default Value:</strong> {{ selectedInputDetails.default_value }}</li>
-            <li v-if="selectedInputDetails.value_description"><strong>Description:</strong> {{ selectedInputDetails.value_description }}</li>
-            <li v-if="selectedInputDetails.variable_type"><strong>Variable Type:</strong> {{ selectedInputDetails.variable_type }}</li>
-            <li v-if="selectedInputDetails.key_assumption"><strong>Assumption:</strong> {{ selectedInputDetails.key_assumption }}</li>
-            <li v-if="selectedInputDetails.source_notes"><strong>Source Notes:</strong> {{ selectedInputDetails.source_notes }}</li>
+            <li v-if="selectedInputDetails.default_value"><strong>Default Value:</strong> {{
+              selectedInputDetails.default_value }}</li>
+            <li v-if="selectedInputDetails.value_description"><strong>Description:</strong> {{
+              selectedInputDetails.value_description }}</li>
+            <li v-if="selectedInputDetails.variable_type"><strong>Variable Type:</strong> {{
+              selectedInputDetails.variable_type }}</li>
+            <li v-if="selectedInputDetails.key_assumption"><strong>Assumption:</strong> {{
+              selectedInputDetails.key_assumption }}</li>
+            <li v-if="selectedInputDetails.source_notes"><strong>Source Notes:</strong> {{
+              selectedInputDetails.source_notes }}</li>
             <li v-if="selectedInputDetails.units"><strong>Units:</strong> {{ selectedInputDetails.units }}</li>
             <li v-if="selectedInputDetails.source_url">
               <strong>Source URL:</strong>
@@ -436,13 +546,14 @@
       </div>
 
       <!-- Mobile Inspector Modal -->
-      <div class="modal fade" id="inspectorModal" tabindex="-1" aria-labelledby="inspectorModalLabel" aria-hidden="true">
+      <div class="modal fade" id="inspectorModal" tabindex="-1" aria-labelledby="inspectorModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-fullscreen-sm-down">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="inspectorModalLabel">Inspector</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                      @click="toggleRightPanel"></button>
+                @click="toggleRightPanel"></button>
             </div>
             <div class="modal-body">
               <div v-if="selectedInputDetails">
@@ -450,11 +561,16 @@
                 <p><em>({{ selectedInputDetails.display_units }})</em></p>
                 <ul class="list-unstyled" style="font-size: 0.95rem;">
                   <li><strong>Raw Value:</strong> {{ selectedInputDetails.value }}</li>
-                  <li v-if="selectedInputDetails.default_value"><strong>Default Value:</strong> {{ selectedInputDetails.default_value }}</li>
-                  <li v-if="selectedInputDetails.value_description"><strong>Description:</strong> {{ selectedInputDetails.value_description }}</li>
-                  <li v-if="selectedInputDetails.variable_type"><strong>Variable Type:</strong> {{ selectedInputDetails.variable_type }}</li>
-                  <li v-if="selectedInputDetails.key_assumption"><strong>Assumption:</strong> {{ selectedInputDetails.key_assumption }}</li>
-                  <li v-if="selectedInputDetails.source_notes"><strong>Source Notes:</strong> {{ selectedInputDetails.source_notes }}</li>
+                  <li v-if="selectedInputDetails.default_value"><strong>Default Value:</strong> {{
+                    selectedInputDetails.default_value }}</li>
+                  <li v-if="selectedInputDetails.value_description"><strong>Description:</strong> {{
+                    selectedInputDetails.value_description }}</li>
+                  <li v-if="selectedInputDetails.variable_type"><strong>Variable Type:</strong> {{
+                    selectedInputDetails.variable_type }}</li>
+                  <li v-if="selectedInputDetails.key_assumption"><strong>Assumption:</strong> {{
+                    selectedInputDetails.key_assumption }}</li>
+                  <li v-if="selectedInputDetails.source_notes"><strong>Source Notes:</strong> {{
+                    selectedInputDetails.source_notes }}</li>
                   <li v-if="selectedInputDetails.units"><strong>Units:</strong> {{ selectedInputDetails.units }}</li>
                   <li v-if="selectedInputDetails.source_url">
                     <strong>Source URL:</strong>
@@ -476,7 +592,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                      @click="toggleRightPanel">Close</button>
+                @click="toggleRightPanel">Close</button>
             </div>
           </div>
         </div>
@@ -486,8 +602,116 @@
 
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+  <script src="js/markdown-loader.js"></script>
   <script type="module">
-    import { scenariosData } from "./scenarios.js";
+    const calculationEngine = {
+      // Basic arithmetic operations
+      add: (a, b) => a + b,
+      subtract: (a, b) => a - b,
+      multiply: (a, b) => a * b,
+      divide: (a, b) => b === 0 ? NaN : a / b,
+
+      // Power and roots
+      power: (a, b) => Math.pow(a, b),
+      sqrt: (a) => Math.sqrt(a),
+
+      // Additional math functions
+      abs: (a) => Math.abs(a),
+      min: (...args) => Math.min(...args),
+      max: (...args) => Math.max(...args),
+      round: (a) => Math.round(a),
+      floor: (a) => Math.floor(a),
+      ceil: (a) => Math.ceil(a),
+
+      // Percentage calculations
+      percent: (a, b) => (a * b) / 100,
+      percentOf: (a, b) => (a / b) * 100,
+
+      // Compound operations
+      sumProduct: (values, multipliers) => {
+        if (!Array.isArray(values) || !Array.isArray(multipliers)) return NaN;
+        return values.reduce((sum, value, index) =>
+          sum + value * (multipliers[index] || 1), 0);
+      },
+
+      // Calculate average
+      average: (values) => {
+        if (!Array.isArray(values) || values.length === 0) return NaN;
+        return values.reduce((sum, val) => sum + val, 0) / values.length;
+      },
+
+      // Simple chain of operations with support for variable names
+      compute: (operations, inputValues, inputNames) => {
+        if (!operations || !operations.length) return NaN;
+
+        let result = null;
+        // Store intermediate results that can be referenced by name
+        const variables = {};
+
+        // If we have named inputs, create an object mapping names to values
+        if (inputNames && Array.isArray(inputNames) && inputValues && Array.isArray(inputValues)) {
+          inputNames.forEach((name, index) => {
+            if (index < inputValues.length) {
+              variables[name] = inputValues[index];
+            }
+          });
+        }
+
+        for (const op of operations) {
+          if (!op.func || !calculationEngine[op.func]) {
+            console.error(`Unknown operation: ${op.func}`);
+            return NaN;
+          }
+
+          // Process arguments to resolve variables and special placeholders
+          const resolvedArgs = (op.args || []).map(arg => {
+            if (arg === 'result' && result !== null) {
+              return result;
+            }
+
+            // Handle both numerical indices and variable names
+            if (typeof arg === 'string') {
+              // Check if it's a variable reference like {varName}
+              const varMatch = arg.match(/^\{([^}]+)\}$/);
+              if (varMatch) {
+                const varName = varMatch[1];
+
+                // First check if it's a named variable
+                if (variables[varName] !== undefined) {
+                  return variables[varName];
+                }
+
+                // Next check if it's a numerical index
+                const index = parseInt(varName);
+                if (!isNaN(index) && index >= 0 && index < inputValues.length) {
+                  return inputValues[index];
+                }
+
+                console.error(`Unknown variable reference: ${arg}`);
+                return 0;
+              }
+            }
+
+            return arg;
+          });
+
+          try {
+            // Apply the operation
+            result = calculationEngine[op.func](...resolvedArgs);
+
+            // Store the result if this operation has a name
+            if (op.name) {
+              variables[op.name] = result;
+            }
+          } catch (error) {
+            console.error(`Error in ${op.func} operation:`, error);
+            return NaN;
+          }
+        }
+
+        return result;
+      }
+    };
 
     const app = Vue.createApp({
       data() {
@@ -500,12 +724,12 @@
           selectedScenario: "All",
           variants: {},
           logs: {},
-          // For inline fill, store the selected variable for each placeholder.
           fillSelections: {},
           activeFillVariable: null,
-          // New reactive properties for mobile handling:
           isMobile: window.innerWidth < 768,
-          mobileInspectorOpen: false
+          mobileInspectorOpen: false,
+          updateTimer: null, // For debouncing calculations
+          errorMessages: [] // Track current error messages
         };
       },
       computed: {
@@ -517,7 +741,6 @@
             ? this.scenariosData
             : this.scenariosData.filter(scenario => scenario.category === this.selectedScenario);
         },
-        // Group inputs by variable_type.
         inputsByType() {
           return Object.values(this.inputs).reduce((groups, input) => {
             if (!groups[input.variable_type]) {
@@ -527,14 +750,12 @@
             return groups;
           }, {});
         },
-        // Compute unique categories from scenarios.
         uniqueCategories() {
           const cats = this.scenariosData
             .filter(scenario => scenario.category)
             .map(scenario => scenario.category);
           return ["All", ...new Set(cats)];
         },
-        // Change inspector button text based on mobile/desktop and open state.
         inspectorButtonText() {
           if (this.isMobile) {
             return this.mobileInspectorOpen ? "Hide Inspector" : "Show Inspector";
@@ -543,9 +764,587 @@
         }
       },
       methods: {
+        // Parse a calculation based on the new format
+        // Parse a calculation based on the new format
+        parseCalculation(calc) {
+          // Handle missing calculation
+          if (!calc) {
+            console.error("Missing calculation definition");
+            return function () { return NaN; };
+          }
+
+          // Handle legacy format (arrow function as string)
+          if (typeof calc.calculate === 'string') {
+            console.warn("Legacy calculation format detected. Consider updating to operation format for better security.");
+
+            try {
+              // Simple functions can be parsed manually
+              const match = calc.calculate.match(/^\s*\(([^)]*)\)\s*=>\s*(.+)\s*$/);
+              if (!match) return function () { return NaN; };
+
+              const params = match[1].split(',').map(p => p.trim());
+              const body = match[2].trim();
+
+              // Create our own function that captures the original string
+              const fn = new Function(...params, `return ${body};`);
+              fn.sourceString = calc.calculate; // Store original for display
+              return fn;
+            } catch (error) {
+              console.error("Error parsing legacy calculation:", error);
+              return function () { return NaN; };
+            }
+          }
+
+          // Handle new operation-based format
+          if (calc.calculateType === 'operations') {
+            const operations = calc.operations || [];
+
+            // Create a function that captures the operations
+            const fn = function (...inputValues) {
+              try {
+                // Get input names from the calculation's inputs property
+                const inputNames = calc.inputs || [];
+
+                // Execute the calculation chain with both values and names
+                return calculationEngine.compute(operations, inputValues, inputNames);
+              } catch (error) {
+                console.error("Error in calculation:", error);
+                return NaN;
+              }
+            };
+
+            // Store the operations for display
+            fn.operations = operations;
+            return fn;
+          }
+
+          console.error("Unsupported calculation format");
+          return function () { return NaN; };
+        },
+        // Get calculation details with both single-line and multi-line pasteable formulas
+        getCalcDetails(calc) {
+          if (!calc.calculate) return "No calculation defined";
+
+          // For operation-based calculations
+          if (calc.calculate.operations) {
+            const operations = calc.calculate.operations;
+            const steps = [];
+            let lastResult = "result";
+
+            // For single-line formula
+            let singleLineFormula = "";
+
+            // For multi-line console code
+            const pasteableSteps = [];
+            const variableValues = {};
+
+            // Initialize input values for formula
+            calc.inputs.forEach((inputVar) => {
+              if (this.inputs[inputVar]) {
+                variableValues[inputVar] = this.inputs[inputVar].value;
+              }
+            });
+
+            // Process each operation and format it for display
+            operations.forEach((op, index) => {
+              const funcName = op.func || 'unknown';
+
+              // Format arguments with variable names when possible (for display)
+              const formattedArgs = (op.args || []).map(arg => {
+                if (arg === 'result') {
+                  return lastResult;
+                }
+
+                if (typeof arg === 'string' && arg.match(/^\{([^}]+)\}$/)) {
+                  // Extract variable name from {varName} format
+                  const varName = arg.slice(1, -1);
+                  // Format variable names to be more readable
+                  return this.formatVariableName(varName);
+                }
+
+                return arg;
+              });
+
+              // Get actual values for single-line formula (replace with actual numbers)
+              const actualValues = (op.args || []).map(arg => {
+                if (arg === 'result') {
+                  // Use the previous formula part
+                  return singleLineFormula;
+                }
+
+                if (typeof arg === 'string' && arg.match(/^\{([^}]+)\}$/)) {
+                  const varName = arg.slice(1, -1);
+
+                  // Look for this variable in our inputs
+                  if (variableValues[varName] !== undefined) {
+                    return variableValues[varName];
+                  }
+
+                  // If it's a numerical index (for legacy support)
+                  const index = parseInt(varName);
+                  if (!isNaN(index) && index >= 0 && index < calc.inputs.length) {
+                    const inputVar = calc.inputs[index];
+                    return variableValues[inputVar];
+                  }
+
+                  return 0; // Fallback
+                }
+
+                return arg; // For literal values
+              });
+
+              // Get variable names for multi-line formula
+              const argVarNames = (op.args || []).map(arg => {
+                if (arg === 'result') {
+                  return "result";
+                }
+
+                if (typeof arg === 'string' && arg.match(/^\{([^}]+)\}$/)) {
+                  const varName = arg.slice(1, -1);
+                  return varName;
+                }
+
+                return arg; // For literal values
+              });
+
+              // Create the step description based on operation type
+              let stepDesc = '';
+              const resultName = op.name ? this.formatVariableName(op.name) : (index === operations.length - 1 ? "Result" : `Step ${index + 1}`);
+              let operationName = op.name || (index === operations.length - 1 ? "result" : `step${index + 1}`);
+
+              // Create formulas for this step
+              let singleLineStep = "";
+              let multiLineStep = "";
+
+              switch (funcName) {
+                case 'add':
+                  stepDesc = `${resultName} = ${formattedArgs[0]} + ${formattedArgs[1]}`;
+                  singleLineStep = `(${actualValues[0]} + ${actualValues[1]})`;
+                  multiLineStep = `${argVarNames[0]} + ${argVarNames[1]}`;
+                  break;
+                case 'subtract':
+                  stepDesc = `${resultName} = ${formattedArgs[0]} - ${formattedArgs[1]}`;
+                  singleLineStep = `(${actualValues[0]} - ${actualValues[1]})`;
+                  multiLineStep = `${argVarNames[0]} - ${argVarNames[1]}`;
+                  break;
+                case 'multiply':
+                  stepDesc = `${resultName} = ${formattedArgs[0]} × ${formattedArgs[1]}`;
+                  singleLineStep = `(${actualValues[0]} * ${actualValues[1]})`;
+                  multiLineStep = `${argVarNames[0]} * ${argVarNames[1]}`;
+                  break;
+                case 'divide':
+                  stepDesc = `${resultName} = ${formattedArgs[0]} ÷ ${formattedArgs[1]}`;
+                  singleLineStep = `(${actualValues[0]} / ${actualValues[1]})`;
+                  multiLineStep = `${argVarNames[0]} / ${argVarNames[1]}`;
+                  break;
+                case 'power':
+                  stepDesc = `${resultName} = ${formattedArgs[0]}^${formattedArgs[1]}`;
+                  singleLineStep = `Math.pow(${actualValues[0]}, ${actualValues[1]})`;
+                  multiLineStep = `Math.pow(${argVarNames[0]}, ${argVarNames[1]})`;
+                  break;
+                case 'sqrt':
+                  stepDesc = `${resultName} = √${formattedArgs[0]}`;
+                  singleLineStep = `Math.sqrt(${actualValues[0]})`;
+                  multiLineStep = `Math.sqrt(${argVarNames[0]})`;
+                  break;
+                case 'percent':
+                  stepDesc = `${resultName} = ${formattedArgs[0]} × ${formattedArgs[1]}%`;
+                  singleLineStep = `(${actualValues[0]} * ${actualValues[1]} / 100)`;
+                  multiLineStep = `${argVarNames[0]} * ${argVarNames[1]} / 100`;
+                  break;
+                case 'percentOf':
+                  stepDesc = `${resultName} = ${formattedArgs[0]} ÷ ${formattedArgs[1]} × 100%`;
+                  singleLineStep = `(${actualValues[0]} / ${actualValues[1]} * 100)`;
+                  multiLineStep = `${argVarNames[0]} / ${argVarNames[1]} * 100`;
+                  break;
+                default:
+                  stepDesc = `${resultName} = ${funcName}(${formattedArgs.join(', ')})`;
+                  singleLineStep = `${funcName}(${actualValues.join(', ')})`;
+                  multiLineStep = `${funcName}(${argVarNames.join(', ')})`;
+              }
+
+              steps.push(stepDesc);
+              singleLineFormula = singleLineStep;
+              pasteableSteps.push(`const ${operationName} = ${multiLineStep};`);
+
+              // Save name for reference in subsequent steps
+              lastResult = resultName;
+
+              // If this operation has a name, store its value for later operations
+              if (op.name) {
+                try {
+                  // Try to calculate the actual value
+                  let value = eval(singleLineStep);
+                  variableValues[op.name] = value;
+                } catch (e) {
+                  console.warn("Could not evaluate step value for", op.name);
+                }
+              }
+            });
+
+            // Build a complete pasteable code block for console
+            let fullPasteableCode = "";
+
+            // First, define all input variables
+            Object.entries(variableValues).forEach(([varName, value]) => {
+              if (calc.inputs.includes(varName)) {
+                fullPasteableCode += `const ${varName} = ${value};\n`;
+              }
+            });
+
+            // Then add each calculation step
+            pasteableSteps.forEach((step) => {
+              fullPasteableCode += step + "\n";
+            });
+
+            // Add a console.log of the final result
+            fullPasteableCode += "console.log(result); // Final answer";
+
+            // Clean up single line formula for Google
+            // Remove any nested parentheses that aren't needed
+            singleLineFormula = singleLineFormula.replace(/\(\(([^()]*)\)\)/g, "($1)");
+
+            // Return the formatted steps and add both pasteable formulas
+            return steps.join('\n') +
+              '\n\n' +
+              'Google-friendly formula: ' + singleLineFormula +
+              '\n\n' +
+              'Console code:\n' + fullPasteableCode;
+          }
+
+          // For legacy function string
+          if (calc.calculate.sourceString) {
+            return calc.calculate.sourceString;
+          }
+
+          // Fallback to function toString
+          return calc.calculate.toString();
+        },
+
+        // Helper method to format variable names to be more human-readable
+        formatVariableName(varName) {
+          // Handle inputs that follow the pattern name__source__unit
+          const parts = varName.split('__');
+          if (parts.length > 1) {
+            // Create a more readable format
+            const baseName = parts[0].replace(/_/g, ' ');
+            return baseName.charAt(0).toUpperCase() + baseName.slice(1);
+          }
+
+          // If it's a simple name or an intermediate result
+          return varName.replace(/_/g, ' ')
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        },
+        // Error display to users
+        showErrorMessage(message) {
+          // Create error alert element
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+          errorDiv.setAttribute('role', 'alert');
+          errorDiv.innerHTML = `
+            <strong>Error:</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+
+          // Find a good container to show the error
+          const container = document.getElementById('errorContainer');
+          if (container) {
+            // Insert at the top of the main content
+            container.appendChild(errorDiv);
+
+            // Auto-dismiss after 8 seconds
+            setTimeout(() => {
+              errorDiv.remove();
+            }, 8000);
+          } else {
+            // Fallback to console if container not found
+            console.error("UI Error:", message);
+          }
+        },
+
+        // Replace the loadData method in the Vue app with this:
+        async loadData() {
+          try {
+            // First try to load from markdown directory
+            const markdownsInputs = await MarkdownDataLoader.fetchMarkdownFiles('data/inputs');
+            const markdownsScenarios = await MarkdownDataLoader.fetchMarkdownFiles('data/scenarios');
+
+            if (markdownsInputs.length > 0 || markdownsScenarios.length > 0) {
+              console.log(`Loaded ${markdownsInputs.length} input files and ${markdownsScenarios.length} scenario files`);
+
+              // Parse the markdown files
+              const inputResults = MarkdownDataLoader.parseMarkdownCollection(markdownsInputs);
+              const scenarioResults = MarkdownDataLoader.parseMarkdownCollection(markdownsScenarios);
+
+              // Initialize inputs
+              this.inputs = Object.values(inputResults.inputs).reduce((acc, input) => {
+                // Ensure numeric values are properly typed
+                if (input.value !== undefined) {
+                  const numValue = parseFloat(input.value);
+                  input.value = isNaN(numValue) ? 0 : numValue;
+                } else {
+                  input.value = 0;
+                }
+
+                // Copy the input with default value
+                acc[input.variable] = {
+                  ...input,
+                  default_value: input.value
+                };
+
+                // Handle phrase_for_card
+                if (input.phrase_for_card) {
+                  this.fillSelections[input.variable] = input.variable;
+                }
+
+                return acc;
+              }, {});
+
+              // Process scenarios if any were loaded
+              if (scenarioResults.scenarios.length > 0) {
+                this.scenariosData = scenarioResults.scenarios.map(calc => {
+                  // Parse the calculation function safely using our calculator engine
+                  calc.calculate = this.parseCalculation(calc);
+
+                  return {
+                    ...calc,
+                    result: {
+                      label: calc.result.label,
+                      value: 0,
+                      rawValue: 0,
+                      units: calc.result.units
+                    },
+                    showDiagram: false,
+                    showCalcDetails: false,
+                    originalInputs: [...calc.inputs]
+                  };
+                });
+              }
+
+              // Initialize variants mapping
+              this.variants = {};
+              Object.keys(this.inputs).forEach(key => {
+                this.variants[key] = key;
+              });
+
+              // Update calculations with the new data
+              this.updateCalculations();
+
+              return;
+            }
+
+            // Fallback to JSON if no markdown files
+            console.log("No markdown files found, falling back to JSON");
+
+            const dataUrl = "data/inputs.json";
+            const response = await fetch(dataUrl);
+
+            if (!response.ok) {
+              throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log("Data successfully loaded");
+
+            // Validate the data structure before processing
+            if (!data || !data.inputs || !Array.isArray(data.inputs)) {
+              throw new Error("Invalid data format: expected array of inputs");
+            }
+
+            // Process the input data safely
+            this.inputs = data.inputs.reduce((acc, input) => {
+              // Validate each input object
+              if (!input || !input.variable) {
+                console.error("Invalid input entry:", input);
+                return acc;
+              }
+
+              // Ensure numeric values are properly typed
+              if (input.value !== undefined) {
+                const numValue = parseFloat(input.value);
+                input.value = isNaN(numValue) ? 0 : numValue;
+              } else {
+                input.value = 0;
+              }
+
+              // Copy the input with default value
+              acc[input.variable] = {
+                ...input,
+                default_value: input.value
+              };
+
+              // Handle phrase_for_card
+              if (input.phrase_for_card) {
+                this.fillSelections[input.variable] = input.variable;
+              }
+
+              return acc;
+            }, {});
+
+            // Initialize variants mapping
+            this.variants = {};
+            Object.keys(this.inputs).forEach(key => {
+              this.variants[key] = key;
+            });
+
+            // Update calculations with the new data
+            this.updateCalculations();
+
+          } catch (e) {
+            console.error("Failed to load data:", e);
+            this.showErrorMessage(`Failed to load calculation data: ${e.message}. Please refresh the page or try again later.`);
+          }
+        },
+
+        // Replace the loadScenarios method with this:
+        async loadScenarios() {
+          try {
+            // If we already loaded scenarios from markdown in loadData, skip this
+            if (this.scenariosData.length > 0) {
+              console.log("Scenarios already loaded from markdown");
+              return;
+            }
+
+            // Fallback to JSON
+            const response = await fetch("data/scenarios.json");
+            if (!response.ok) {
+              throw new Error(`Failed to load scenarios: ${response.status}`);
+            }
+
+            const data = await response.json();
+            this.scenariosData = data.map(calc => {
+              // Parse the calculation function safely using our calculator engine
+              calc.calculate = this.parseCalculation(calc);
+
+              return {
+                ...calc,
+                result: {
+                  label: calc.result.label,
+                  value: 0,
+                  rawValue: 0,
+                  units: calc.result.units
+                },
+                showDiagram: false,
+                showCalcDetails: false,
+                originalInputs: [...calc.inputs]
+              };
+            });
+
+            this.updateCalculations();
+          } catch (err) {
+            console.error("Failed to load scenarios:", err);
+            this.showErrorMessage("Failed to load calculation scenarios. Please try refreshing the page.");
+          }
+        },
+        // Safe input validation
+        validateNumericInput(value) {
+          // Check if the input is a valid number
+          const numValue = parseFloat(value);
+          return !isNaN(numValue) && isFinite(numValue);
+        },
+
+        // User input processing with validation and debouncing
+        updateValue(event, key) {
+          const inputValue = event.target.value.trim();
+          const scale = this.inputs[key].scale || 1;
+
+          // Validate the input
+          if (inputValue === '') {
+            // Allow empty input, will be treated as 0
+            this.inputs[key].value = 0;
+            this.logChange(key, 0);
+            this.updateCalculations();
+            return;
+          }
+
+          if (!this.validateNumericInput(inputValue)) {
+            // Invalid input
+            event.target.classList.add('is-invalid');
+            // Revert to the previous value
+            event.target.value = this.formatValue(this.inputs[key].value, scale);
+            this.showErrorMessage(`Invalid number format for ${this.inputs[key].nice_name || this.formatLabel(key)}`);
+            return;
+          }
+
+          // Valid input - remove any error indication
+          event.target.classList.remove('is-invalid');
+
+          // Process the valid input
+          const newVal = parseFloat(inputValue) * scale;
+          if (this.inputs[key].value !== newVal) {
+            this.inputs[key].value = newVal;
+            this.logChange(key, newVal);
+
+            // Debounce the calculation update
+            if (this.updateTimer) {
+              clearTimeout(this.updateTimer);
+            }
+            this.updateTimer = setTimeout(() => {
+              this.updateCalculations();
+            }, 300); // 300ms debounce
+          }
+        },
+
+        // Safe calculation updating
+        updateCalculations() {
+          if (Object.keys(this.inputs).length === 0) {
+            console.log("Waiting for inputs to load...");
+            return;
+          }
+          this.scenariosData.forEach((calc) => {
+            const inputKeys = calc.inputs;
+            if (inputKeys) {
+              const inputValues = inputKeys.map(key => {
+                if (this.inputs[key] !== undefined) {
+                  return this.inputs[key].value;
+                } else {
+                  console.error(`Missing input value for key: ${key}`);
+                  return null;
+                }
+              });
+
+              if (!inputValues.includes(null)) {
+                if (typeof calc.calculate === "function") {
+                  try {
+                    const result = calc.calculate(...inputValues);
+
+                    // Validate the result
+                    if (isNaN(result) || !isFinite(result)) {
+                      throw new Error("Calculation resulted in an invalid number");
+                    }
+
+                    calc.result.value = this.humanReadable(result);
+                    calc.result.rawValue = result;
+                  } catch (error) {
+                    console.error("Error evaluating calculation:", error, "Calculation:", calc.title);
+                    calc.result.value = "Error in calculation";
+                    calc.result.rawValue = null;
+
+                    // Show user-facing error for this specific calculation
+                    this.showErrorMessage(`Error in calculation "${calc.title}": ${error.message}`);
+                  }
+                } else {
+                  calc.result.value = "N/A";
+                  calc.result.rawValue = null;
+                }
+              } else {
+                console.error(`Missing inputs for calculation: ${calc.title}`);
+                calc.result.value = "Missing inputs";
+              }
+            } else {
+              console.error(`Input keys not found for calculation: ${calc.title}`);
+              calc.result.value = "Configuration error";
+            }
+          });
+        },
+
+        // UI control methods
         toggleLeftPanel() {
           this.leftPanelOpen = !this.leftPanelOpen;
         },
+
         toggleRightPanel() {
           if (this.isMobile) {
             const modalEl = document.getElementById("inspectorModal");
@@ -555,37 +1354,41 @@
             this.rightPanelOpen = !this.rightPanelOpen;
           }
         },
+
         toggleCategory(cat) {
           this.selectedScenario = (this.selectedScenario === cat) ? "All" : cat;
         },
+
         formatLabel(key) {
           return key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
         },
+
         formatValue(value, scale) {
           return scale ? value / scale : value;
         },
-        updateValue(event, key) {
-          const scale = this.inputs[key].scale || 1;
-          const newVal = parseFloat(event.target.value) * scale;
-          if (this.inputs[key].value !== newVal) {
-            this.inputs[key].value = newVal;
-            this.logChange(key, newVal);
-            this.updateCalculations();
-          }
-        },
+
         adjustValue(key, factor) {
           const currentVal = parseFloat(this.inputs[key].value) || 0;
           const newVal = currentVal * factor;
           this.inputs[key].value = newVal;
           this.logChange(key, newVal);
-          this.updateCalculations();
+
+          // Debounce the calculation update
+          if (this.updateTimer) {
+            clearTimeout(this.updateTimer);
+          }
+          this.updateTimer = setTimeout(() => {
+            this.updateCalculations();
+          }, 300); // 300ms debounce
         },
+
         resetValue(key) {
           const defaultVal = this.inputs[key].default_value;
           this.inputs[key].value = defaultVal;
           this.logChange(key, defaultVal);
           this.updateCalculations();
         },
+
         logChange(key, newValue) {
           if (!this.logs[key]) {
             this.logs[key] = [];
@@ -593,6 +1396,7 @@
           const timestamp = new Date().toLocaleTimeString();
           this.logs[key].push({ time: timestamp, value: newValue });
         },
+
         showDetails(key) {
           this.selectedInputKey = key;
           if (this.isMobile) {
@@ -608,10 +1412,12 @@
             });
           }
         },
+
         onCardDropdownChange(variable, newValue) {
           this.fillSelections[variable] = newValue;
           this.applyCardVariantChange();
         },
+
         applyCardVariantChange() {
           this.scenariosData.forEach((calc) => {
             if (!calc.originalInputs) {
@@ -623,145 +1429,124 @@
           });
           this.updateCalculations();
         },
-        updateCalculations() {
-          this.scenariosData.forEach((calc) => {
-            const inputKeys = calc.inputs;
-            if (inputKeys) {
-              const inputValues = inputKeys.map(key => {
-                if (this.inputs[key] !== undefined) {
-                  return this.inputs[key].value;
-                } else {
-                  console.error(`Missing input value for key: ${key}`);
-                  return null;
-                }
-              });
-              if (!inputValues.includes(null)) {
-                if (typeof calc.calculate === "function") {
-                  try {
-                    const result = calc.calculate(...inputValues);
-                    calc.result.value = this.humanReadable(result);
-                    calc.result.rawValue = result;
-                  } catch (error) {
-                    console.error("Error evaluating calculation:", error, "Calculation:", calc.title);
-                    calc.result.value = "Error";
-                    calc.result.rawValue = null;
-                  }
-                } else {
-                  calc.result.value = "N/A";
-                  calc.result.rawValue = null;
-                }
-              } else {
-                console.error(`Missing inputs for calculation: ${calc.title}`);
-              }
-            } else {
-              console.error(`Input keys not found for calculation: ${calc.title}`);
-            }
-          });
-        },
+
+        // Safe human-readable number formatting
         humanReadable(value) {
+          // Handle edge cases
+          if (value === undefined || value === null) return "N/A";
           if (value === 0) return "0";
+          if (!isFinite(value)) return value > 0 ? "Infinity" : "-Infinity";
+          if (isNaN(value)) return "NaN";
+
+          // Format small numbers
           if (Math.abs(value) < 1) {
             let valueStr = value.toString();
             let firstNonZeroIndex = valueStr.indexOf(valueStr.match(/[1-9]/));
-            return value.toFixed(firstNonZeroIndex + 1);
+            return value.toFixed(Math.min(firstNonZeroIndex + 1, 10)); // Cap at 10 decimal places for safety
           }
+
+          // Format large numbers with units
           const units = ["", "thousand", "million", "billion", "trillion"];
-          const order = Math.floor(Math.log10(Math.abs(value)) / 3);
+          const order = Math.min(Math.floor(Math.log10(Math.abs(value)) / 3), units.length - 1);
+
           if (order === 0) {
             return value.toFixed(2);
           }
+
           const unitName = units[order] || `10^${order * 3}`;
           const adjustedValue = value / Math.pow(10, 3 * order);
           return `${adjustedValue.toFixed(2)} ${unitName}`;
         },
-        // Parse the description into segments (text and variable placeholders).
+
         parseDescription(desc) {
+          if (Object.keys(this.inputs).length === 0) {
+            console.log("Waiting for inputs to load to parse description");
+            return;
+          }
+          if (!desc) return [{ type: 'text', text: '' }];
+
           const segments = [];
           let lastIndex = 0;
           const regex = /\{([^}]+)\}/g;
           let match;
+
           while ((match = regex.exec(desc)) !== null) {
             if (match.index > lastIndex) {
               segments.push({ type: 'text', text: desc.slice(lastIndex, match.index) });
             }
-            segments.push({ type: 'variable', variable: match[1] });
+
+            // Validate the variable name before using it
+            const varName = match[1];
+            if (this.inputs[varName]) {
+              segments.push({ type: 'variable', variable: varName });
+            } else {
+              console.error(`Unknown variable in description: ${varName}`);
+              segments.push({ type: 'text', text: `{${varName}}` });
+            }
+
             lastIndex = regex.lastIndex;
           }
+
           if (lastIndex < desc.length) {
             segments.push({ type: 'text', text: desc.slice(lastIndex) });
           }
+
           return segments;
         },
-        // Return fill options for a variable group (by variable_type).
+
         getFillOptionsForType(variable) {
           if (!this.inputs[variable]) return [];
+
           const vt = this.inputs[variable].variable_type;
+          if (!vt || !this.inputsByType[vt]) return [];
+
           return this.inputsByType[vt].map(input => ({
             variable: input.variable,
-            text: input.phrase_for_card || input.nice_name
+            text: input.phrase_for_card || input.nice_name || this.formatLabel(input.variable)
           }));
         },
+
         getFillTextFor(variable) {
           const selectedVar = this.fillSelections[variable] || variable;
           return this.inputs[selectedVar] && this.inputs[selectedVar].phrase_for_card
             ? this.inputs[selectedVar].phrase_for_card
-            : variable;
+            : this.formatLabel(variable);
         },
-        processDescription(desc) {
-          return this.parseDescription(desc);
-        },
-        async loadData() {
-          try {
-            const gistUrl = "data/inputs.yaml";
-            const response = await fetch(gistUrl);
-            if (!response.ok) throw new Error("Failed to load data from Gist");
-            const yamlText = await response.text();
-            const data = jsyaml.load(yamlText);
-            console.log("Data successfully loaded");
-            this.inputs = data.inputs.reduce((acc, input) => {
-              acc[input.variable] = { ...input, default_value: input.value };
-              if (input.phrase_for_card) {
-                this.fillSelections[input.variable] = input.variable;
-              }
-              return acc;
-            }, {});
-            this.variants = {};
-            Object.keys(this.inputs).forEach(key => {
-              this.variants[key] = key;
-            });
-            this.updateCalculations();
-          } catch (e) {
-            console.error("Failed to load data from Gist:", e);
-          }
-        },
+
         toggleDiagram(index) {
-          this.scenariosData[index].showDiagram = !this.scenariosData[index].showDiagram;
+          a
+          if (index >= 0 && index < this.scenariosData.length) {
+            this.scenariosData[index].showDiagram = !this.scenariosData[index].showDiagram;
+          }
         }
       },
       mounted() {
-        // Initialize scenariosData from the imported module—preserving calculation functions and original inputs.
-        this.scenariosData = scenariosData.map(calc => ({
-          ...calc,
-          result: { label: calc.result.label, value: 0, rawValue: 0, units: calc.result.units },
-          showDiagram: false,
-          showCalcDetails: false,
-          originalInputs: [...calc.inputs]
-        }));
+        // Load scenarios securely
+        this.loadScenarios();
+
+        // Load input data securely
         this.loadData();
 
-        // Update mobile flag on window resize.
+        // Handle responsive design
         window.addEventListener('resize', () => {
           this.isMobile = window.innerWidth < 768;
         });
 
-        // Set up event listeners on the inspector modal to track its open/close state.
+        // Handle modal events
         const modalEl = document.getElementById('inspectorModal');
-        modalEl.addEventListener('shown.bs.modal', () => { this.mobileInspectorOpen = true; });
-        modalEl.addEventListener('hidden.bs.modal', () => { this.mobileInspectorOpen = false; });
+        if (modalEl) {
+          modalEl.addEventListener('shown.bs.modal', () => {
+            this.mobileInspectorOpen = true;
+          });
+          modalEl.addEventListener('hidden.bs.modal', () => {
+            this.mobileInspectorOpen = false;
+          });
+        }
       }
     });
 
     app.mount("#app");
   </script>
 </body>
+
 </html>
